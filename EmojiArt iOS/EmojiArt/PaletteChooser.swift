@@ -33,27 +33,27 @@ struct PaletteChooser: View {
             Image(systemName: "paintpalette")
         }
         .font(emojiFont)
+        .paletteControlButtonStyle()
         .contextMenu { contextMenu }
     }
     
     @ViewBuilder
     var contextMenu: some View {
         AnimatedActionButton(title: "Edit", systemImage: "pencil") {
-//            editing = true
             paletteToEdit = store.palette(at: chosenPaletteIndex)
         }
         AnimatedActionButton(title: "New",  systemImage: "plus") {
             store.insertPalette(named: "New", emojis: "", at: chosenPaletteIndex)
-//            editing = true
             paletteToEdit = store.palette(at: chosenPaletteIndex)
-
         }
         AnimatedActionButton(title: "Delete", systemImage: "minus.circle") {
             chosenPaletteIndex = store.removePalette(at: chosenPaletteIndex)
         }
+        #if os(iOS)
         AnimatedActionButton(title: "Manager", systemImage: "slider.vertical.3") {
             managing = true
         }
+        #endif
         gotoMenu
     }
     
@@ -81,15 +81,14 @@ struct PaletteChooser: View {
         .transition(rollTransition)
         .popover(item: $paletteToEdit) { palette in
             PaletteEditor(palette: $store.palettes[palette])
+                .popoverPadding()
                 .wrappedInNavigationViewToMakeDismissable { paletteToEdit = nil }
         }
         .sheet(isPresented: $managing) {
             PaletteManager()
         }
     }
-    
-//    @State private var editing = false
-    
+        
     @State private var managing = false
     @State private var paletteToEdit:  Palette?
     
